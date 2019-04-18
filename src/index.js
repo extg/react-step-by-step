@@ -1,7 +1,23 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { createStore } from "redux";
 
 import "./styles.css";
+
+const reducer = (state = 0, action) => {
+  switch (action.type) {
+    case "INCREMENT":
+      return state + 1;
+    case "DECREMENT":
+      return state - 1;
+    case "RESET":
+      return 0;
+    default:
+      return state;
+  }
+};
+
+const store = createStore(reducer);
 
 const CounterComponent = ({ value, decrement, increment, reset }) => (
   <div className="App">
@@ -12,36 +28,20 @@ const CounterComponent = ({ value, decrement, increment, reset }) => (
   </div>
 );
 
-class Counter extends React.Component {
-  state = {
-    value: 0
-  };
-
-  decrement = () => {
-    this.setState({ value: this.state.value - 1 });
-  };
-  increment = () => {
-    this.setState({ value: this.state.value + 1 });
-  };
-  reset = () => {
-    this.setState({ value: 0 });
-  };
-
-  render = () => (
-    <CounterComponent
-      value={this.state.value}
-      decrement={this.decrement}
-      increment={this.increment}
-      reset={this.reset}
-    />
-  );
-}
-
 const App = () => (
   <div className="App">
-    <Counter />
+    <CounterComponent
+      value={store.getState()}
+      decrement={() => store.dispatch({ type: "DECREMENT" })}
+      increment={() => store.dispatch({ type: "INCREMENT" })}
+      reset={() => store.dispatch({ type: "RESET" })}
+    />
   </div>
 );
 
 const rootElement = document.getElementById("root");
-ReactDOM.render(<App />, rootElement);
+
+const render = () => ReactDOM.render(<App />, rootElement);
+
+store.subscribe(render);
+render();
